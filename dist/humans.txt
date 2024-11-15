@@ -1,0 +1,19 @@
+# humans.txt
+
+See https://humanstxt.org/ for information on why this exists :-)
+
+## TEAM
+
+Maintainer: Clifford Weinmann
+Contact: https://www.cliffordweinmann.com/
+
+## THANKS
+
+The Open Source community!
+None of my work would exist without every one of you.
+
+## SITE
+
+Doctype: HTML5
+Languate: English
+IDE: vim

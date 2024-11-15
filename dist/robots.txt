@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /.fake_directory/
+Crawl-delay: 10

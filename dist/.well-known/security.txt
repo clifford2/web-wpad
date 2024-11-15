@@ -1,0 +1,9 @@
+# Information for security researchers wanting to
+# responsibly disclose security issues.
+# As per https://securitytxt.org/
+
+Contact: mailto:hostmaster@weinmann.africa
+Contact: https://www.cliffordweinmann.com/
+Expires: 2025-11-14T00:00:00Z
+Preferred-Languages: en
+Canonical: https://www.cliffordweinmann.com/.well-known/security.txt

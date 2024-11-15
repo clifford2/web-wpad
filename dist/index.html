@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="en" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Web Proxy Auto-Discovery</title>
+<link rel="stylesheet" href="highlight.min.css">
+<style media="screen" type="text/css">
+body, html {
+	height: 100%;
+	margin: 0;
+}
+html, body, div, object, h2
+{
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1em;
+	background: transparent;
+}
+/*
+a:link, a:visited, a:hover, a:active { text-decoration: none; }
+a:hover { text-decoration: underline; }
+*/
+.content h2 {
+	font-size: 2em;
+	text-shadow: 0 3px 3px #999;
+}
+.content {
+	font-size: 1em;
+	margin: 0;
+	padding: 4em;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%)
+}
+</style>
+<script src="highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</head>
+<body>
+<div class="wrapper2">
+<div class="content">
+<h2>Web Proxy Auto-Discovery</h2>
+<p>The <a href="https://en.wikipedia.org/wiki/Web_Proxy_Auto-Discovery_Protocol">Web Proxy Auto-Discovery</a> (WPAD) Protocol is a method used by clients to locate the URL of a <a href="https://en.wikipedia.org/wiki/Proxy_auto-config">Proxy auto-config</a> (PAC) configuration file using DHCP and/or DNS discovery methods.</p>
+<p>While greatly simplifying configuration of one organisation's web browsers, the WPAD protocol can open doors for attackers to change what appears on a user's browser.</p>
+<p>
+<em>This site exists only as a security measure, to prevent WPAD DNS queries for this domain or it's subdomains from leaking to higher level domains.</em>
+<br>It configures browsers to contact websites directly, without using a (possibly malicious) proxy.
+</p>
+<p>Files served here:</p>
+<ul>
+<li><a href="wpad.dat"><code>wpad.dat</code></a> for DNS lookups - the reason for this site - served with MIME type <code>application/x-ns-proxy-autoconfig</code></li>
+<li>Copy in <code>wpad.da</code> for broken Internet Explorer version 6.0.2900.2180.xpsp_sp2_rtm</li>
+<li>Copy in <code>proxy.pac</code> - traditional file name for DHCP configurations</li>
+</ul>
+<p>Our very simple <a href="https://en.wikipedia.org/wiki/Proxy_auto-config">Proxy auto-config</a> (PAC) JavaScript function:</p>
+<pre><code>
+function FindProxyForURL(url, host)
+{
+  return "DIRECT";
+}
+</code></pre>
+</div>
+</div>
+</body>
+</html>
