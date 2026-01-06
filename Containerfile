@@ -4,6 +4,7 @@
 #   podman build -t web-wpad:$(cat .version) .
 # Run with:
 #   podman run --rm -d --name web-wpad -p 8080:8080 localhost/web-wpad:$(cat .version)
+#   xdg-open http://0.0.0.0:8080/
 
 FROM docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine3.22-slim
 ARG UID=101
