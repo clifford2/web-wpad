@@ -1,4 +1,11 @@
-FROM docker.io/nginxinc/nginx-unprivileged:1.27.3-alpine3.20
+# Serve this content in a container
+#
+# Build with:
+#   podman build -t web-wpad:$(cat .version) .
+# Run with:
+#   podman run --rm -d --name web-wpad -p 8080:8080 localhost/web-wpad:$(cat .version)
+
+FROM docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine3.22-slim
 ARG UID=101
 COPY --chmod=0644 nginx-default.conf /etc/nginx/conf.d/default.conf
 COPY --chmod=0644 dist/ /usr/share/nginx/html/

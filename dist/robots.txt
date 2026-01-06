@@ -1,3 +1,20 @@
+# OpenAI's crawler bot
+# https://platform.openai.com/docs/bots
+# Site’s content should not be used in training generative AI foundation models. 
+User-agent: GPTBot
+Disallow: /
+
+# Google's special-case crawlers ignore the global robots.txt user agent (*) with the ad publisher's permission
+# https://developers.google.com/search/docs/crawling-indexing/google-special-case-crawlers
+User-agent: AdsBot-Google
+User-agent: AdsBot-Google-Mobile
+User-agent: Mediapartners-Google
+Disallow: /
+
 User-agent: *
+# Help us detect abusers of this file
 Disallow: /.fake_directory/
+# Nonstandard - see https://en.wikipedia.org/wiki/Robots.txt#Crawl-delay_directive
 Crawl-delay: 10
+
+# More great examples: https://en.wikipedia.org/robots.txt
