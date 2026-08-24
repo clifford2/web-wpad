@@ -60,6 +60,8 @@ AddType application/x-ns-proxy-autoconfig .dat
 AddType application/x-ns-proxy-autoconfig .pac
 ```
 
+You can also set this in [`.htaccess`](dist/.htaccess) if allowed.
+
 ### WPAD DNS Entries
 
 For browsers to discover your PAC file, DNS `A` / `CNAME` records are needed in your domain, for a host named `wpad`.
