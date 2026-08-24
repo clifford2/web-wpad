@@ -1,3 +1,5 @@
+# Please conform to the robots.txt standard
+
 # OpenAI's crawler bot
 # https://platform.openai.com/docs/bots
 # Site’s content should not be used in training generative AI foundation models. 
@@ -13,8 +15,66 @@ Disallow: /
 
 User-agent: *
 # Help us detect abusers of this file
-Disallow: /.fake_directory/
+Disallow: /.robots.txt.abuse/
 # Nonstandard - see https://en.wikipedia.org/wiki/Robots.txt#Crawl-delay_directive
 Crawl-delay: 10
+# https://contentsignals.org/
+Content-Signal: ai-train=no, search=yes, ai-input=no
 
-# More great examples: https://en.wikipedia.org/robots.txt
+# Bots designed to copy entire sites, per https://en.wikipedia.org/robots.txt 2026-05-06
+User-agent: sitecheck.internetseer.com
+Disallow: /
+
+User-agent: Zealbot
+Disallow: /
+
+User-agent: MSIECrawler
+Disallow: /
+
+User-agent: SiteSnagger
+Disallow: /
+
+User-agent: WebStripper
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: Fetch
+Disallow: /
+
+User-agent: Offline Explorer
+Disallow: /
+
+User-agent: Teleport
+Disallow: /
+
+User-agent: TeleportPro
+Disallow: /
+
+User-agent: WebZIP
+Disallow: /
+
+User-agent: linko
+Disallow: /
+
+User-agent: HTTrack
+Disallow: /
+
+User-agent: Microsoft.URL.Control
+Disallow: /
+
+User-agent: Xenu
+Disallow: /
+
+User-agent: larbin
+Disallow: /
+
+User-agent: libwww
+Disallow: /
+
+User-agent: ZyBORG
+Disallow: /
+
+User-agent: Download Ninja
+Disallow: /
