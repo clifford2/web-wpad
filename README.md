@@ -60,7 +60,7 @@ AddType application/x-ns-proxy-autoconfig .dat
 AddType application/x-ns-proxy-autoconfig .pac
 ```
 
-You can also set this in [`.htaccess`](dist/.htaccess) if allowed.
+You can also set this in a [`.htaccess`](dist/.htaccess) file if allowed.
 
 ### WPAD DNS Entries
 
