@@ -34,11 +34,11 @@ For an example of this, see <http://wpad.cliffordweinmann.com/>.
 
 ### Serve The PAC Files
 
-To use this for your own domain (`example.com`), simply serve the contents of the [`dist/`](dist) directory on a HTTP server (not HTTPS) at the `wpad` subdomain of you domain (`http://wpad.example.com/`).
+To use this for your own domain (`example.com`), simply serve the contents of the [`dist/`](dist) directory on a HTTP server (*not HTTPS*) at the `wpad` subdomain of you domain (`http://wpad.example.com/`).
 
 Note that the MIME type for the PAC files must be `application/x-ns-proxy-autoconfig`.
 
-To set this in Nginx, add this to your `server` block (example in [`examples/nginx-default.conf`](examples/nginx-default.conf)):
+To set this in Nginx, add this to your `server` block:
 
 ```nginx
 location ~ ^/wpad\.da {
@@ -51,7 +51,9 @@ location = /proxy.pac {
 }
 ```
 
-In Apache, you can add this to the appropriate configuration file (ideally for this `VirtualHost` only):
+A full example is available in [`examples/nginx-default.conf`](examples/nginx-default.conf).
+
+In Apache, you can add this to the appropriate configuration file (ideally for the WPAD `VirtualHost` only):
 
 ```apache
 AddType application/x-ns-proxy-autoconfig .dat
@@ -62,7 +64,7 @@ AddType application/x-ns-proxy-autoconfig .pac
 
 For browsers to discover your PAC file, DNS `A` / `CNAME` records are needed in your domain, for a host named `wpad`.
 
-The WPAD [internet draft](https://datatracker.ietf.org/doc/html/draft-ietf-wrec-wpad-01) also recommended that clients support DNS `SRV` and `TXT service` records.
+The WPAD [internet draft](https://datatracker.ietf.org/doc/html/draft-ietf-wrec-wpad-01) also recommends that clients support DNS `SRV` and `TXT service` records.
 
 Example DNS entries (*substitite your domain name and server IP address*):
 
@@ -94,8 +96,8 @@ For the [ISC Kea DHCP](https://www.isc.org/kea/) Server (DHCPv4 only), here is a
     "subnet4": [
         {
             "id": 1,
-            "subnet": "192.168.124.0/24",
-            "pools": [ { "pool": "192.168.124.200 - 192.168.124.254" } ],
+            "subnet": "192.168.42.0/24",
+            "pools": [ { "pool": "192.168.42.200 - 192.168.42.254" } ],
             "option-data": [
                 // ---- Set WPAD option value ---- //
                 {
