@@ -38,7 +38,7 @@ To use this for your own domain (`example.com`), simply serve the contents of th
 
 Note that the MIME type for the PAC files must be `application/x-ns-proxy-autoconfig`.
 
-To set this in Nginx, add this to your `server` block:
+To set this in [Nginx](https://nginx.org/), add this to your `server` block:
 
 ```nginx
 location ~ ^/wpad\.da {
@@ -53,7 +53,7 @@ location = /proxy.pac {
 
 A full example is available in [`examples/nginx-default.conf`](examples/nginx-default.conf).
 
-In Apache, you can add this to the appropriate configuration file (ideally for the WPAD `VirtualHost` only):
+In [Apache](https://httpd.apache.org/), you can add this to the appropriate configuration file (ideally for the WPAD `VirtualHost` only):
 
 ```apache
 AddType application/x-ns-proxy-autoconfig .dat
@@ -113,7 +113,7 @@ For the [ISC Kea DHCP](https://www.isc.org/kea/) Server (DHCPv4 only), here is a
 
 A full example is available in [`examples/kea-dhcp4.conf`](examples/kea-dhcp4.conf).
 
-In dnsmasq, you can add something like this to the configuration file:
+In [dnsmasq](https://dnsmasq.org/doc.html), you can add something like this to the configuration file:
 
 ```
 dhcp-option=252,"http://wpad.example.com/wpad.dat"
