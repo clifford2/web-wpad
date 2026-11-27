@@ -68,7 +68,7 @@ AddType application/x-ns-proxy-autoconfig .pac
 
 You can also set this in a [`.htaccess`](dist/.htaccess) file if allowed.
 
-On [Netlify](https://www.netlify.com/), you can set the headers in a `netlify.toml` file in your site's base directory. An example is available in [`src/netlify.toml`](src/netlify.toml). Check that the `wpad.da` and `proxy.pac` symbolic links are deployed; if not, replace them with copies of `wpad.dat`.
+On [Netlify](https://www.netlify.com/), you can set the headers in a `netlify.toml` file in your site's base directory. An example is available in [`src/netlify.toml`](src/netlify.toml).
 
 ### WPAD DNS Entries
 
