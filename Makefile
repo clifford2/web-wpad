@@ -11,10 +11,8 @@ IMGBASENAME := web-wpad
 DEVTAG := dev
 DEVPORT := 8080
 
-# Get current version (used in image tags and when bumping version numbers)
+# Get current version (used in image tags)
 APP_VERSION := $(shell cat .version 2>/dev/null || echo '0.0.0-new')
-BUILD_TIME := $(shell TZ=UTC date '+%Y-%m-%dT%H:%M:%SZ')
-GIT_REVISION := $(shell git rev-parse @)
 
 # Construct image names
 IMGDEVTAG := localhost/$(IMGBASENAME):$(DEVTAG)
@@ -30,13 +28,13 @@ endif
 
 ifeq ($(CONTAINER_ENGINE),podman)
 	BUILDARCH := $(shell podman version --format '{{.Client.OsArch}}' | cut -d/ -f2)
-	BUILD_NOLOAD := podman build --build-arg=APP_VERSION="$(APP_VERSION)" --build-arg=BUILD_TIME="$(BUILD_TIME)" --build-arg=GIT_REVISION="$(GIT_REVISION)"
+	BUILD_NOLOAD := podman build
 	BUILD_CMD := $(BUILD_NOLOAD)
 	DIGEST_CMD := podman inspect --format "{{.Digest}}"
 	RUN_CMD := podman run --replace
 else
 	BUILDARCH := $(shell docker version --format '{{.Client.Arch}}')
-	BUILD_NOLOAD := docker buildx build -f Containerfile --build-arg=APP_VERSION="$(APP_VERSION)" --build-arg=BUILD_TIME="$(BUILD_TIME)" --build-arg=GIT_REVISION="$(GIT_REVISION)"
+	BUILD_NOLOAD := docker buildx build -f Containerfile
 	BUILD_CMD := $(BUILD_NOLOAD) --load
 	DIGEST_CMD := docker inspect --format "{{.Id}}"
 	RUN_CMD := docker run
@@ -55,17 +53,16 @@ help:
 	@echo "  open-dev:       Run development container & open in browser"
 	@echo "  stop-dev:       Stop development container"
 	@echo "additional testing:"
-	@echo "  run-dev:        Run DEFAULT (no colour override) development container on port $(DEVPORT)"
+	@echo "  run-dev:        Run development container on port $(DEVPORT)"
 	@echo ""
 	@echo "Release steps:"
 	@echo ""
-	@echo "  make lint:           Check for YAML syntax errors"
 	@echo "  git commit -a:       Commit changes to version control"
 	@echo "  make git-tag-push:   Tag git repo with current version & push"
 	@echo ""
 	@echo "Optional release targets:"
 	@echo ""
-	@echo "  build-release:  Build release image ($(IMGRELTAG)) (also done by GitHub Actions)"
+	@echo "  build-release:  Build release image ($(IMGRELTAG))"
 	@echo "  push-release:   Push release image ($(IMGRELTAG))"
 	@echo "  run-release:    Run DEFAULT release container on port $(DEVPORT)"
 	@echo "  stop-release:   Stop release container"
@@ -74,11 +71,6 @@ help:
 	@echo "Would build version $(APP_VERSION)"
 	@echo "DEV image: $(IMGDEVTAG)"
 	@echo "RELEASE image: $(IMGRELTAG)"
-
-# Show app version
-.PHONY: get-version
-get-version:
-	@echo "$(APP_VERSION)"
 
 # Show calculated DEV image name
 .PHONY: get-dev-image-name
@@ -114,10 +106,10 @@ build-dev:
 	@curl --include http://127.0.0.1:$(DEVPORT)/wpad.dat
 	@echo ""
 
-# Run DEV instance with default colour
+# Run DEV instance
 .PHONY: run-dev
 run-dev:
-	$(RUN_CMD) --rm -d -p $(DEVPORT):8080 --name $(IMGBASENAME) --memory-reservation 16m --memory-reservation 32m $(IMGDEVTAG)
+	$(RUN_CMD) --rm -d -p $(DEVPORT):8080 --name $(IMGBASENAME) --memory-reservation 16m --memory 32m $(IMGDEVTAG)
 	@echo "The container should be accessible at http://0.0.0.0:$(DEVPORT)/"
 
 # Stop DEV container
@@ -144,7 +136,7 @@ pull-release:
 .PHONY: run-release
 run-release:
 	$(CONTAINER_ENGINE) ps -a | grep -w $(IMGBASENAME); if [ $$? -eq 0 ]; then $(CONTAINER_ENGINE) stop $(IMGBASENAME); fi
-	$(RUN_CMD) --rm -d -p $(DEVPORT):8080 --name $(IMGBASENAME) --memory-reservation 16m --memory-reservation 32m $(IMGRELTAG)
+	$(RUN_CMD) --rm -d -p $(DEVPORT):8080 --name $(IMGBASENAME) --memory-reservation 16m --memory 32m $(IMGRELTAG)
 	@echo "The container should be accessible at http://0.0.0.0:$(DEVPORT)/"
 
 # Start RELEASE instance & show results
@@ -171,16 +163,9 @@ push-release:
 	$(CONTAINER_ENGINE) tag $(IMGRELTAG) $(IMGRELNAME):latest
 	$(CONTAINER_ENGINE) push $(IMGRELNAME):latest
 
-# Syntax check source code
-.PHONY: lint
-lint: .check-lint-depends
-	@yamllint .github/workflows/build-image.yaml
-	@yamllint deploy/k8s-latest.yaml
-	@yamllint deploy/openshift-route.yaml
-
 # git tag with current APP_VERSION
 .PHONY: .git-tag
-.git-tag: .check-git-deps lint
+.git-tag: .check-git-deps
 	@git tag -m "Version $(APP_VERSION)" $(APP_VERSION)
 
 # git push
@@ -199,7 +184,7 @@ git-tag-push: .git-tag .git-push
 
 # Verify that we have dependencies for versioning targets installed
 .PHONY: .check-ver-deps
-.check-ver-deps: .install-semver
+.check-ver-deps:
 	test -f /usr/bin/env
 	command -v bash
 	command -v cat
@@ -212,13 +197,8 @@ git-tag-push: .git-tag .git-push
 	command -v curl
 	command -v jq
 
-# Verify that we have dependencies for syntax checks
-.PHONY: .check-lint-depends
-.check-lint-depends:
-	command -v yamllint
-
 # Verify that we have all required dependencies installed
 .PHONY: check-depends
-check-depends: .check-git-deps .check-test-deps .check-lint-depends
+check-depends: .check-git-deps .check-test-deps
 	command -v podman || command -v docker
 	command -v git

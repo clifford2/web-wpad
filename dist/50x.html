@@ -1,48 +1,45 @@
 ﻿<!DOCTYPE html>
-<html lang="en" xml:lang="en">
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Web Proxy Auto-Discovery</title>
-<link rel="stylesheet" href="highlight.min.css">
-<style media="screen" type="text/css">
-body, html {
-	height: 100%;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Error - Web Proxy Auto-Discovery</title>
+<style>
+html, body {
 	margin: 0;
 }
-html, body, div, object, h2
-{
+html, body, div, h2 {
 	font-weight: normal;
 	font-style: normal;
 	font-size: 1em;
 	background: transparent;
 }
-/*
-a:link, a:visited, a:hover, a:active { text-decoration: none; }
-a:hover { text-decoration: underline; }
-*/
+body {
+	/* Centre content, but let it grow and scroll when taller than the window */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+}
+.content {
+	box-sizing: border-box;
+	max-width: 60em;
+	padding: 4em;
+}
 .content h2 {
 	font-size: 2em;
 	text-shadow: 0 3px 3px #999;
 }
-.content {
-	font-size: 1em;
-	margin: 0;
-	padding: 4em;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin-right: -50%;
-	transform: translate(-50%, -50%)
+@media (max-width: 40em) {
+	.content { padding: 1em; }
 }
 </style>
 </head>
 <body>
-<div class="wrapper2">
 <div class="content">
 <h2>An error occurred</h2>
 <p>Sorry, the page you are looking for is currently unavailable.</p>
-<p><a href="/">Go back</a></p>
-</div>
+<p><a href="/">Go to the home page</a></p>
 </div>
 </body>
 </html>

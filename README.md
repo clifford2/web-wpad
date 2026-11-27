@@ -4,7 +4,7 @@
 
 This code contains a Proxy auto-config (PAC) file ([`wpad.dat`](dist/wpad.dat)) that configures browsers to contact websites directly, without using a (possibly malicious) proxy.
 
-Serving this file for your domain eliminates the risk of a higher level domain serving a file that directs your traffic to their proxy.
+Serving this file for your domain stops WPAD DNS lookups from falling through to a higher level domain, which could otherwise serve a file that directs your traffic to its proxy.
 
 ## About Proxy Configuration Protocols
 
@@ -16,9 +16,15 @@ A [Proxy auto-config](https://en.wikipedia.org/wiki/Proxy_auto-config) (PAC) con
 
 While greatly simplifying configuration of one organisation's web browsers, the WPAD protocol can open doors for attackers to change what appears on a user's browser.
 
-When WPAD is enabled, operating systems and browsers automatically attempt to discover proxy settings by querying local and domain DNS servers, broadcast protocol mechanisms, and DHCP options. If your internal or public domain does not host a PAC file, an attacker can spoof one and force your network's web traffic through a malicious proxy.
+When WPAD is enabled, operating systems and browsers automatically attempt to discover a PAC file:
 
-One way to prevent this is to serve a valid PAC file, and make it discoverable via WPAD, for your domain.
+- via DHCP (option 252), and
+- by looking up a host named `wpad` in DNS - first in the client's own domain, then (on some clients) in each parent domain in turn ("domain devolution"), e.g. `wpad.sales.example.com`, then `wpad.example.com`.
+- If DNS returns no answer, Windows clients may also fall back to local broadcast name resolution (LLMNR / NetBIOS).
+
+If your domain does not answer the `wpad` lookup, whoever controls a parent domain, or an attacker answering broadcast queries on your local network, can supply their own PAC file and force your network's web traffic through a malicious proxy.
+
+One way to reduce this risk is to serve a valid PAC file, and make it discoverable via WPAD, for your domain. Note that this does not protect against an attacker who can run a rogue DHCP server on your network.
 
 ## Files Served
 
@@ -34,14 +40,14 @@ For an example of this, see <http://wpad.cliffordweinmann.com/>.
 
 ### Serve The PAC Files
 
-To use this for your own domain (`example.com`), simply serve the contents of the [`dist/`](dist) directory on a HTTP server (*not HTTPS*) at the `wpad` subdomain of you domain (`http://wpad.example.com/`).
+To use this for your own domain (`example.com`), simply serve the contents of the [`dist/`](dist) directory on an HTTP server (*not HTTPS*) at the `wpad` subdomain of your domain (`http://wpad.example.com/`).
 
-Note that the MIME type for the PAC files must be `application/x-ns-proxy-autoconfig`.
+The PAC files should be served with the MIME type `application/x-ns-proxy-autoconfig`. Many clients don't check this, but some do, so it is best to set it.
 
 To set this in [Nginx](https://nginx.org/), add this to your `server` block:
 
 ```nginx
-location ~ ^/wpad\.da {
+location ~ ^/wpad\.dat?$ {
 	types { }
 	default_type application/x-ns-proxy-autoconfig;
 }
@@ -62,31 +68,47 @@ AddType application/x-ns-proxy-autoconfig .pac
 
 You can also set this in a [`.htaccess`](dist/.htaccess) file if allowed.
 
+On [Netlify](https://www.netlify.com/), you can set the headers in a `netlify.toml` file in your site's base directory. An example is available in [`src/netlify.toml`](src/netlify.toml). Check that the `wpad.da` and `proxy.pac` symbolic links are deployed; if not, replace them with copies of `wpad.dat`.
+
 ### WPAD DNS Entries
 
-For browsers to discover your PAC file, DNS `A` / `CNAME` records are needed in your domain, for a host named `wpad`.
+For browsers to discover your PAC file, your domain needs a DNS `A` (or `CNAME`) record for a host named `wpad`. This is the DNS method that clients actually use.
 
-The WPAD [internet draft](https://datatracker.ietf.org/doc/html/draft-ietf-wrec-wpad-01) also recommends that clients support DNS `SRV` and `TXT service` records.
+> **Windows DNS Server / Active Directory:** by default, Windows DNS Server refuses to answer queries for `wpad` (and `isatap`), because both names are on its *global query block list*. Your `wpad` record will not resolve until you remove `wpad` from that list, e.g. with PowerShell:
+>
+> ```powershell
+> Set-DnsServerGlobalQueryBlockList -List isatap
+> ```
+>
+> or `dnscmd /config /globalqueryblocklist isatap`.
 
-Example DNS entries (*substitite your domain name and server IP address*):
+The WPAD [internet draft](https://datatracker.ietf.org/doc/html/draft-ietf-wrec-wpad-01) (an expired 1999 draft, never an RFC) also recommends (*SHOULD*, not *MUST*) that clients support DNS `SRV` and `TXT` records, at `wpad.tcp.<domain>` and `wpad.<domain>` respectively. As far as we know, no major browser or operating system uses them, but they do no harm.
+
+Example DNS entries (*substitute your domain name and server IP address*):
 
 ```bind
 $ORIGIN example.com.
-wpad       IN A   192.168.42.1
-_wpad._tcp IN SRV 10 10 80 wpad.example.com.
-@          IN TXT service: wpad:http://wpad.example.com/wpad.dat
+; Required
+wpad       IN A   192.168.42.10
+; Optional - per the WPAD draft, rarely (if ever) used by clients
+wpad.tcp   IN SRV 10 10 80 wpad.example.com.
+wpad       IN TXT "service: wpad:http://wpad.example.com/wpad.dat"
 ```
+
+Note that a `TXT` record can't be added to a name that is a `CNAME`, so use an `A` record for `wpad` if you want the `TXT` record.
 
 ### WPAD DHCP
 
 In order to use DHCP, the server must be configured to serve up the site-specific option 252 (`auto-proxy-config`) with a string value of e.g. `http://wpad.example.com/wpad.dat`.
+
+Some older Windows clients are reported to drop the last character of the option 252 string. If your clients fail to fetch the file, try adding a trailing newline or null character to the value (e.g. `"http://wpad.example.com/wpad.dat\n"` in dnsmasq).
 
 For the [ISC Kea DHCP](https://www.isc.org/kea/) Server (DHCPv4 only), here is an example of the key code snippets you require:
 
 ```
 {
 "Dhcp4": {
-    // ---- Define WPAD option 255 ---- //
+    // ---- Define WPAD option 252 ---- //
     "option-def": [
       {
         "name": "wpad-url",
@@ -106,9 +128,9 @@ For the [ISC Kea DHCP](https://www.isc.org/kea/) Server (DHCPv4 only), here is a
                     "name": "wpad-url",
                     "data": "http://wpad.example.com/wpad.dat"
                 }
-            ],
+            ]
         }
-    ],
+    ]
 }
 }
 ```
