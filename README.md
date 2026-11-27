@@ -97,6 +97,22 @@ wpad       IN TXT "service: wpad:http://wpad.example.com/wpad.dat"
 
 Note that a `TXT` record can't be added to a name that is a `CNAME`, so use an `A` record for `wpad` if you want the `TXT` record.
 
+### Multiple Domains
+
+You don't need a separate website for each domain. Clients fetch `http://wpad.<their-domain>/wpad.dat` from whatever server that name resolves to, so one server can serve every domain. Point each domain's `wpad` record at it:
+
+```bind
+wpad.example.com.        IN CNAME wpad.common.example.net.
+wpad.example.org.        IN CNAME wpad.common.example.net.
+wpad.sales.example.com.  IN CNAME wpad.common.example.net.
+```
+
+The [example Nginx configuration](examples/nginx-default.conf) answers for any `wpad.*` host name, so it needs no changes.
+
+Add a record for each subdomain that clients belong to as well (e.g. `wpad.sales.example.com` for `pc1.sales.example.com`). Don't rely on clients devolving to the parent domain's `wpad` record: modern Windows limits how far it does this.
+
+Use DNS records rather than HTTP redirects. A redirect still needs a web server answering for each `wpad` host name, and clients don't handle redirects consistently.
+
 ### WPAD DHCP
 
 In order to use DHCP, the server must be configured to serve up the site-specific option 252 (`auto-proxy-config`) with a string value of e.g. `http://wpad.example.com/wpad.dat`.
